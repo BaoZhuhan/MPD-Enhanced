@@ -91,6 +91,21 @@ def get_one_result(info_json):
                 if final_metric > 1:
                     final_metric = 1
 
+                # Timbre similarity boost
+                test_emb = test_label.get('vocal_embedding')
+                lib_emb = additional_library_label.get('vocal_embedding')
+                if test_emb is not None and lib_emb is not None:
+                    import numpy as np
+                    t_vec = np.array(test_emb, dtype=np.float64)
+                    l_vec = np.array(lib_emb, dtype=np.float64)
+                    t_norm = np.linalg.norm(t_vec)
+                    l_norm = np.linalg.norm(l_vec)
+                    if t_norm > 0 and l_norm > 0:
+                        cos_sim = np.dot(t_vec, l_vec) / (t_norm * l_norm)
+                        cos_sim = max(-1.0, min(1.0, cos_sim))
+                        timbre_boost = 1.0 + 0.15 * (cos_sim - 0.5)
+                        final_metric = final_metric * timbre_boost
+
                 result_entry = CompareHelper([final_metric, test_label, additional_library_label, test_points[i], additional_library_points[j]])
                 
                 # heap 크기 제한 로직
@@ -196,7 +211,8 @@ class TestDataset(Dataset):
                                     "song_end": infos['beat_times'][-1],
                                     "chord": chord,
                                     "used_time": None,
-                                    "info_link": info_link
+                                    "info_link": info_link,
+                                    "vocal_embedding": infos.get('vocal_embedding', None),
                                 }
                                 images.append(quantize_image(image))
                                 labels.append(label)
@@ -297,7 +313,8 @@ class TestDataset2(Dataset):
                                 "song_end": infos['beat_times'][-1],
                                 "chord": chord,
                                 "used_time": None,
-                                "info_link": info_link
+                                "info_link": info_link,
+                                "vocal_embedding": infos.get('vocal_embedding', None),
                             }
                             images.append(quantize_image(image))
                             labels.append(label)

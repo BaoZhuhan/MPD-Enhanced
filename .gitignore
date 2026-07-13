@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# SLURM job outputs
+*.out
+*.err
+*.sbatch
+
+# Temporary separation files (from demucs)
+separated_*/
+
+# Audio transcription output (generated on-the-fly)
+*.json
+
+# Model checkpoints (too large for git — re-add with git-lfs if needed)
+ml_models/Beat-Transformer/checkpoint/*
+!ml_models/Beat-Transformer/checkpoint/fold_4_trf_param.pt
+ml_models/AST/models/*
+
+# Cache directories
+.cache/

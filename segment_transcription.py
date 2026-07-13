@@ -11,6 +11,7 @@ from madmom.features.beats import DBNBeatTrackingProcessor
 import shutil
 from madmom.features.downbeats import DBNDownBeatTrackingProcessor
 from utils import vocal_midi2note, quantize, chord_quantize, save_to_json
+from vocal_embedding import extract_vocal_embedding
 import time
 import uuid
 
@@ -112,6 +113,9 @@ def segment_transcription(audio_path):
         
         print("Step 6: Transcribing vocals...")
         vocal_notes = vocal_midi2note(vocal_trans(vocal_wav_path, device=device))
+
+        print("Step 6.5: Extracting vocal timbre embedding...")
+        vocal_embed = extract_vocal_embedding(vocal_wav_path, device=device)
         
         # chord_info = transcript("chord", wav_path)[1]  # 주석 처리됨
         sav_path = wav_path[:-4] + ".json" 
@@ -123,19 +127,20 @@ def segment_transcription(audio_path):
         
         print("Step 7: Creating music info object...")
         wav_music_info = Music_info(
-                melody_info=None, 
-                bass_info=None, 
-                chord_info=None, 
+                melody_info=None,
+                bass_info=None,
+                chord_info=None,
                 vocal_info=vocal_infos,
-                chart_scale=None, 
-                title=str(wav_name), 
-                bpm=int(bpm), 
-                rhythm=int(rhythm), 
+                chart_scale=None,
+                title=str(wav_name),
+                bpm=int(bpm),
+                rhythm=int(rhythm),
                 downbeat_start=float(downbeat_start),
-                beat_times=beat_times, 
-                boundaries=None, 
-                segment_label=None, 
+                beat_times=beat_times,
+                boundaries=None,
+                segment_label=None,
                 link=None,
+                vocal_embedding=vocal_embed,
             )
             
         os.makedirs(os.path.dirname(sav_path), exist_ok=True)

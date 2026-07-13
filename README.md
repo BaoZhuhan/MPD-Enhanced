@@ -1,62 +1,100 @@
 <div align="center">
 
-  <img width="300" alt="MIPPIA Logo" src="https://github.com/user-attachments/assets/bc77c131-f5ee-449d-a438-60838917906a" />
-
-  <br>
-  
-<h3>Music Plagiarism Detection: Problem Formulation And A Segment-based Solution</h3>
+<h1>MPD-Enhanced: Music Plagiarism Detection with Timbre Embedding</h1>
 
   <br>
 
 <p>
-  <b>Seonghyeon Go*</b> · <b>Yumin Kim*</b> 
+  <b>Fork of</b> <a href="https://github.com/Mippia/Music-Plagiarism-Detection"><b>Mippia/Music-Plagiarism-Detection</b></a><br>
+  <i>Music Plagiarism Detection: Problem Formulation And A Segment-based Solution</i><br>
+  <sub>Seonghyeon Go* · Yumin Kim* (MIPPIA Inc.)</sub>
 </p>
-<p>MIPPIA Inc.</p>
 
 [![Paper](https://img.shields.io/badge/arXiv-2601.21260-b31b1b)](https://arxiv.org/abs/2601.21260)
-[![Project Page](https://img.shields.io/badge/Project-Website-blue)](https://mippia.github.io/icassp-mpd/)
+[![Original Project Page](https://img.shields.io/badge/Project-Website-blue)](https://mippia.github.io/icassp-mpd/)
 [![Demo Page](https://img.shields.io/badge/Demo-Page-red)](https://huggingface.co/spaces/mippia/MPD-demo)
-[![MIPPIA Page](https://img.shields.io/badge/MIPPIA-Page-green)](https://mippia.com/ko/howtouse/test)
 </div>
 
-## Transcription Demo Usage
-```bash
-python inference.py {wav_path}
+## Overview
+
+**MPD-Enhanced** builds on the original [Music-Plagiarism-Detection](https://github.com/Mippia/Music-Plagiarism-Detection) (MPD) pipeline by adding **vocal timbre embedding** as an additional similarity dimension for plagiarism detection.
+
+### What's New
+
+- **Vocal timbre embedding** (SpeechBrain ECAPA-TDNN, 192-dim) extracted from the separated vocal track
+- Timbre cosine similarity fused into the existing chroma-based matching score:
+  ```
+  final_score = chroma_similarity × (1.0 + 0.15 × (timbre_cos_sim - 0.5))
+  ```
+  - Same vocal timbre: +7.5% boost
+  - Different vocal timbre: -7.5% penalty  
+  - No embedding available (legacy data): neutral (factor = 1.0)
+- Fully backward-compatible with existing covers80 JSON files
+
+### Original Features (preserved)
+
+- **Demucs** audio source separation (vocals, piano, drums, bass, other)
+- **Beat-Transformer** for beat/downbeat tracking
+- **AST** (EfficientNet-b0) for vocal-to-MIDI transcription
+- **Segment-based matching** — 4-bar window comparison using chroma features
+- Covers80 dataset (164 songs) as the reference library
+
+## Pipeline
+
+```
+Input Audio (.wav/.mp3)
+  │
+  ├─ Demucs → vocal / piano / drums / bass / other
+  │
+  ├─ Beat-Transformer → beat_times, downbeats, BPM
+  │
+  ├─ AST → MIDI notes (pitch + timing)
+  │
+  ├─ ECAPA-TDNN → 192-dim timbre embedding (NEW)
+  │
+  └─ Compare → chroma similarity × timbre boost → Top 3 matches
 ```
 
-This will analyze the audio file and provide simple transcription results with musical segment information, same as demo page.
-Please use this demo for understanding the concept of segment-level matching!
+## Usage
 
-## SMP Dataset Overview
+```bash
+# Transcribe and compare a song against the covers80 library
+python inference.py /path/to/song.wav
+```
 
-The SMP (Segment-based Music Plagiarism) dataset contains music plagiarism detection pairs with temporal segment annotations. Each row represents a pair of songs with identified similar segments.
+This generates:
+1. A `<song>.json` transcription file (with `vocal_embedding` field)
+2. Top 3 plagiarism matches with similarity scores
 
-## Dataset Structure
+## Dataset
 
-| Column | Description |
-|--------|-------------|
-| `ori_title` | Title of the original song |
-| `comp_title` | Title of the comparison song |
-| `ori_link` | YouTube link to the original song |
-| `comp_link` | YouTube link to the comparison song |
-| `relation` | Relationship type (`plag` for plagiarism) |
-| `ori_times` | List of start times (in seconds) of similar segments in original song |
-| `comp_times` | List of start times (in seconds) of similar segments in comparison song |
-| `pair_number` | Unique identifier for song pairs |
-| `acoustic_idx` | Unique identifier for segment pairs |
+### SMP Dataset
+The original SMP (Segment-based Music Plagiarism) dataset contains 175 segment pair annotations (99 plag + 76 remake) across 72 song pairs.
 
-## Data Format
+### covers80 Library
+164 pre-transcribed songs used as the reference comparison database.
 
-- **Time annotations**: JSON-formatted lists containing start times of similar segments
-- **Temporal alignment**: `ori_times` and `comp_times` correspond to matching similar segments between songs
-- **Segment duration**: Each segment represents a temporally coherent musical phrase or motif
+## Installation
 
-## Statistics
+```bash
+# Python 3.9+ required (madmom compatibility)
+pip install -r requirements.txt
 
-- Total pairs: Multiple song pairs with plagiarism relationships
-- Temporal annotations: Precise start times for similar musical segments
-- Multi-language: Includes both English and Korean songs
+# Additional: timbre embedding
+pip install speechbrain
+```
 
 ## License
 
-Our code and demo website are licensed under a [GPL License](https://www.gnu.org/licenses/gpl-3.0.html).
+GPL License (inherited from original work).
+
+## Citation
+
+```bibtex
+@article{go2025music,
+  title={Music Plagiarism Detection: Problem Formulation And A Segment-based Solution},
+  author={Go, Seonghyeon and Kim, Yumin},
+  journal={arXiv preprint arXiv:2601.21260},
+  year={2025}
+}
+```
