@@ -19,8 +19,8 @@ import soundfile as sf
 os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 
-# 本地缓存目录
-CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model_cache", "hub")
+# 本地缓存目录（相对于项目根目录）
+CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "model_cache", "hub")
 
 
 def _load_audio(path, target_sr=16000):

@@ -3,7 +3,7 @@ import numpy as np
 import librosa
 import soundfile
 import demucs.separate
-from wav_quantizer import wav_quantizing
+from transcription.wav_quantizer import wav_quantizing
 from ml_models.AST.do_everything import vocal_trans
 from music_info import Music_info
 from ml_models.DilatedTransformer import Demixed_DilatedTransformerModel
@@ -11,8 +11,8 @@ from madmom.features.beats import DBNBeatTrackingProcessor
 import shutil
 from madmom.features.downbeats import DBNDownBeatTrackingProcessor
 from utils import vocal_midi2note, quantize, chord_quantize, save_to_json
-from vocal_embedding import extract_vocal_embedding
-from lyrics_transcription import transcribe_lyrics
+from transcription.vocal_embedding import extract_vocal_embedding
+from transcription.lyrics_transcription import transcribe_lyrics
 import time
 import uuid
 
