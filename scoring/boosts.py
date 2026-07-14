@@ -28,7 +28,7 @@ def compute_timbre_boost(test_label, lib_label):
     lib_emb = lib_label.get("vocal_embedding")
 
     if test_emb is None or lib_emb is None:
-        return 1.0, {"available": False}
+        return 1.0, {"available": False, "value": 1.0}
 
     t_vec = np.array(test_emb, dtype=np.float64)
     l_vec = np.array(lib_emb, dtype=np.float64)
@@ -36,13 +36,13 @@ def compute_timbre_boost(test_label, lib_label):
     l_norm = np.linalg.norm(l_vec)
 
     if t_norm == 0 or l_norm == 0:
-        return 1.0, {"available": True, "cos_sim": 0.0}
+        return 1.0, {"available": True, "value": 1.0, "cos_sim": 0.0}
 
     cos_sim = float(np.dot(t_vec, l_vec) / (t_norm * l_norm))
     cos_sim = max(-1.0, min(1.0, cos_sim))
     boost = 1.0 + 0.15 * (cos_sim - 0.5)
 
-    return boost, {"available": True, "cos_sim": round(cos_sim, 4)}
+    return boost, {"available": True, "value": round(boost, 4), "cos_sim": round(cos_sim, 4)}
 
 
 def compute_lyrics_boost_fn(test_label, lib_label):
@@ -60,11 +60,11 @@ def compute_lyrics_boost_fn(test_label, lib_label):
     lib_lyrics = lib_label.get("lyrics")
 
     if test_lyrics is None or lib_lyrics is None:
-        return 1.0, {"available": False}
+        return 1.0, {"available": False, "value": 1.0}
 
     boost, sim = compute_lyrics_boost(test_lyrics, lib_lyrics)
 
-    return boost, {"available": True, "lyrics_sim": sim}
+    return boost, {"available": True, "value": round(boost, 4), "lyrics_sim": sim}
 
 
 def compute_all_boosts(test_label, lib_label):

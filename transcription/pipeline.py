@@ -29,14 +29,26 @@ downbeat_tracker = DBNDownBeatTrackingProcessor(beats_per_bar=[3, 4],
 
 device = 'cuda'
 
-def segment_transcription(audio_path):
+def segment_transcription(audio_path, output_dir=None):
     """
-    개선된 segment_transcription 함수
-    - 고유한 임시 폴더 사용으로 동시 처리 지원
-    - try-finally로 안전한 파일 정리
+    Transcribe audio to structured JSON.
+
+    Args:
+        audio_path: path to input audio file (.wav/.mp3)
+        output_dir: directory for output JSON (default: same as input)
+
+    Returns:
+        path to the generated JSON file
     """
     wav_path = audio_path
     wav_name = os.path.splitext(os.path.basename(wav_path))[0]
+
+    # 输出路径：与输入同目录或指定目录
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        sav_path = os.path.join(output_dir, f"{wav_name}.json")
+    else:
+        sav_path = wav_path[:-4] + ".json"
     
     # 고유한 폴더명 생성 (타임스탬프 + UUID)
     unique_id = f"{wav_name}_{int(time.time() * 1000)}_{str(uuid.uuid4())[:8]}"
@@ -122,7 +134,6 @@ def segment_transcription(audio_path):
         lyrics_result = transcribe_lyrics(vocal_wav_path, model_size="base", device=device)
 
         # chord_info = transcript("chord", wav_path)[1]  # 주석 처리됨
-        sav_path = wav_path[:-4] + ".json" 
 
         beat_times, downbeat_start, rhythm, bpm = quantize_result[0]
         chord_time_gap = (beat_times[1] - beat_times[0]) * rhythm

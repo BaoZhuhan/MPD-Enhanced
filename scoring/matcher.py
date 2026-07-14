@@ -19,16 +19,22 @@ from scoring.boosts import compute_all_boosts
 from scoring.compare_utils import remove_1, algorithmic_collate3, CompareHelper, \
     shift_image_optimized, piano_roll_to_chroma, calculate_correlation
 
-covers80_path = "covers80"
-youtubecover_jsons = glob.glob(os.path.join(covers80_path, "*.json"))
 
-
-def get_one_result(info_json):
+def get_one_result(info_json, library_path=None):
     """
     Compare input song JSON against all covers80 library songs.
 
+    Args:
+        info_json: path to the input song's JSON transcription
+        library_path: path to library JSON directory (default: "covers80")
+
     Returns sorted list of CompareHelper objects (best matches first).
     """
+    if library_path is None:
+        library_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "covers80")
+    youtubecover_jsons = glob.glob(os.path.join(library_path, "*.json"))
+
     device = torch.device('cpu')
     use_new_bpm = False
     inst = 'vocal'
@@ -92,15 +98,16 @@ def get_one_result(info_json):
         for i, test_label in enumerate(test_labels):
             for j, lib_label in enumerate(lib_labels):
                 metric = metrics[i, j].item()
-                final_metric = min(metric, 1.0)
+                chroma_raw = min(metric, 1.0)
 
                 # Apply all dimension boosts (timbre + lyrics + future)
-                total_boost, _ = compute_all_boosts(test_label, lib_label)
-                final_metric *= total_boost
+                total_boost, boost_details = compute_all_boosts(test_label, lib_label)
+                final_metric = chroma_raw * total_boost
 
                 result_entry = CompareHelper([
                     final_metric, test_label, lib_label,
-                    test_points[i], lib_points[j]
+                    test_points[i], lib_points[j],
+                    chroma_raw, boost_details,   # ← 分维度信息
                 ])
 
                 # Top-K heap
