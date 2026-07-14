@@ -3,7 +3,7 @@ class Music_info:
     def __init__(self,melody_info=None, bass_info=None, drum_info=None, chord_info=None, vocal_info=None, piano_info=None, chart_scale=None,
                  title="default_title", bpm=None, rhythm = None, downbeat_start=None, beat_times=None, boundaries = None,
                    segment_label= None, link=None,platform=None, newbpm=None, key=None, structure_starting_point=None, structure_json=None, preview_music_path=None,
-                   vocal_embedding=None):
+                   vocal_embedding=None, lyrics=None):
 
         self.melody_info = melody_info
         self.bass_info = bass_info
@@ -12,6 +12,7 @@ class Music_info:
         self.vocal_info = vocal_info
         self.piano_info = piano_info # None for now
         self.vocal_embedding = vocal_embedding
+        self.lyrics = lyrics  # {"full_text": "...", "segments": [...], "language": "en"}
         self.chart_scale = chart_scale
         self.title = title
         self.bpm = bpm

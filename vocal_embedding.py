@@ -12,11 +12,38 @@ Usage:
 
 import os
 import torch
-import torchaudio
 import numpy as np
+import soundfile as sf
 
-# Cache directory for model weights (group storage, not HOME)
-CACHE_DIR = "/hpc/group/honglab/zb78/cache/speechbrain"
+# 配置 hf-mirror（解决国内访问 HuggingFace 的问题）
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+
+# 本地缓存目录
+CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model_cache", "hub")
+
+
+def _load_audio(path, target_sr=16000):
+    """使用 soundfile 加载音频（避免 torchcodec 依赖问题）"""
+    audio, sr = sf.read(path, dtype="float32")
+
+    # 转 mono
+    if audio.ndim > 1:
+        audio = audio.mean(axis=1)
+
+    # 转 tensor
+    signal = torch.from_numpy(audio).unsqueeze(0)  # (1, samples)
+
+    # 重采样到 16kHz
+    if sr != target_sr:
+        import torchaudio.functional as F
+        signal = F.resample(signal, sr, target_sr)
+
+    # 归一化
+    signal = signal / signal.abs().max()
+
+    return signal
+
 
 def extract_vocal_embedding(vocal_path, device="cuda"):
     """
@@ -40,26 +67,19 @@ def extract_vocal_embedding(vocal_path, device="cuda"):
         return None
 
     try:
-        # Load model (auto-downloads to cache on first use)
+        # 修复 device 格式：SpeechBrain 需要 "cuda:0" 而非 "cuda"
+        if device == "cuda":
+            device = "cuda:0"
+
+        # 从本地缓存加载模型（已通过 hf-mirror 预下载）
         classifier = EncoderClassifier.from_hparams(
             source="speechbrain/spkrec-ecapa-voxceleb",
             run_opts={"device": device},
             savedir=CACHE_DIR,
         )
 
-        # Load audio
-        signal, sr = torchaudio.load(vocal_path)
-
-        # Resample to 16kHz (ECAPA expects 16kHz)
-        if sr != 16000:
-            signal = torchaudio.functional.resample(signal, sr, 16000)
-
-        # Convert to mono
-        if signal.shape[0] > 1:
-            signal = signal.mean(dim=0, keepdim=True)
-
-        # Normalize
-        signal = signal / signal.abs().max()
+        # 使用 soundfile 加载音频（避免 torchcodec CUDA 依赖问题）
+        signal = _load_audio(vocal_path)
 
         # Move to device
         signal = signal.to(device)

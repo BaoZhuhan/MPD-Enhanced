@@ -10,6 +10,7 @@ from compare_utils import remove_1, algorithmic_collate3, CompareHelper, quantiz
 import glob
 from torch.utils.data import Dataset
 import unicodedata
+from lyrics_similarity import compute_lyrics_boost
 
 covers80_path = "covers80"
 youtubecover_jsons = glob.glob(os.path.join(covers80_path, "*.json"))
@@ -105,6 +106,13 @@ def get_one_result(info_json):
                         cos_sim = max(-1.0, min(1.0, cos_sim))
                         timbre_boost = 1.0 + 0.15 * (cos_sim - 0.5)
                         final_metric = final_metric * timbre_boost
+
+                # Lyrics similarity boost (NEW)
+                test_lyrics = test_label.get('lyrics')
+                lib_lyrics = additional_library_label.get('lyrics')
+                if test_lyrics is not None and lib_lyrics is not None:
+                    lyrics_boost, lyrics_sim = compute_lyrics_boost(test_lyrics, lib_lyrics)
+                    final_metric = final_metric * lyrics_boost
 
                 result_entry = CompareHelper([final_metric, test_label, additional_library_label, test_points[i], additional_library_points[j]])
                 
@@ -213,6 +221,7 @@ class TestDataset(Dataset):
                                     "used_time": None,
                                     "info_link": info_link,
                                     "vocal_embedding": infos.get('vocal_embedding', None),
+                                    "lyrics": infos.get('lyrics', None),
                                 }
                                 images.append(quantize_image(image))
                                 labels.append(label)
@@ -315,6 +324,7 @@ class TestDataset2(Dataset):
                                 "used_time": None,
                                 "info_link": info_link,
                                 "vocal_embedding": infos.get('vocal_embedding', None),
+                                "lyrics": infos.get('lyrics', None),
                             }
                             images.append(quantize_image(image))
                             labels.append(label)
