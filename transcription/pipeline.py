@@ -87,7 +87,8 @@ def segment_transcription(audio_path, output_dir=None):
             "-o", separated_base,
             to_name
         ])
-        safety.sync_cuda()  # flush Demucs async ops
+        safety.sync_cuda()   # flush Demucs async ops
+        safety.empty_cache()  # free Demucs allocs before loading next model
 
         # 분리된 파일 경로들
         vocal_wav_name = f"{separated_base}/htdemucs/{wav_name}/vocals.wav"
@@ -129,14 +130,17 @@ def segment_transcription(audio_path, output_dir=None):
         print("Step 5: Quantizing audio...")
         quantize_result = wav_quantizing(wav_path, spleeter_dict, downbeat_model, beat_tracker, downbeat_tracker, device)
         safety.sync_cuda()
+        safety.empty_cache()  # Beat→AST transition
 
         print("Step 6: Transcribing vocals...")
         vocal_notes = vocal_midi2note(vocal_trans(vocal_wav_path, device=device))
         safety.sync_cuda()
+        safety.empty_cache()  # AST→ECAPA transition
 
         print("Step 6.5: Extracting vocal timbre embedding...")
         vocal_embed = extract_vocal_embedding(vocal_wav_path, device=device)
         safety.sync_cuda()
+        safety.empty_cache()  # ECAPA→Whisper transition
 
         print("Step 6.6: Transcribing lyrics with Whisper...")
         lyrics_result = transcribe_lyrics(vocal_wav_path, model_size="base", device=device)

@@ -85,6 +85,21 @@ def sync_cuda():
         pass
 
 
+def empty_cache():
+    """
+    Clear GPU memory cache between model switches.
+    The linear pipeline loads Demucs→Beat→AST→ECAPA→Whisper
+    sequentially; without this, stale allocations accumulate
+    across different model memory regions.
+    """
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except Exception:
+        pass
+
+
 # ── Phase 3: Auto-apply patches on import ──
 
 _patch_pin_memory()
