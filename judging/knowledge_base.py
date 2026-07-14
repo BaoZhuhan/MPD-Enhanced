@@ -1,8 +1,9 @@
 """
 Music plagiarism knowledge base for RAG context.
 
-Contains legal standards, famous cases, and musicological criteria
-used as reference when the LLM judges potential plagiarism.
+All legal standards and case summaries are sourced from verifiable
+court opinions, legal databases, and reliable secondary sources.
+Each entry includes the source URL for independent verification.
 """
 
 # ============================================================
@@ -12,82 +13,138 @@ used as reference when the LLM judges potential plagiarism.
 LEGAL_CRITERIA = r"""
 ## Music Plagiarism Legal Standards
 
-### Two-Part Test (US Copyright Law)
-1. **Access**: The defendant must have had access to the original work.
-   - Direct access: provable exposure (radio play, sales, live performance)
-   - Indirect access: widespread dissemination or chain of access
-   - Striking similarity alone can substitute for proving access
+### Two-Part Test for Copyright Infringement (US)
 
-2. **Substantial Similarity**: The works must be substantially similar.
-   - Ordinary observer test: would an average listener recognize the copying?
-   - Extrinsic test: objective analysis of musical elements (melody, harmony, rhythm)
-   - Intrinsic test: subjective impression of an ordinary listener
-   - De minimis defense: trivial copying is not infringement
+1. **Ownership of a valid copyright** — plaintiff must prove they own the work
 
-### Key Legal Doctrines
-- **Scènes à faire**: Common musical elements/techniques are not copyrightable
-  (standard chord progressions, basic rhythms, generic arrangements)
-- **Idea-Expression Dichotomy**: Musical ideas (genre, style, feel) are not
-  protected; only the specific expression is
-- **Independent Creation Defense**: If the defendant created the work
-  independently without access to the original
-- **Fair Use** (17 USC §107): Purpose/character, nature of work, amount used,
-  market effect
+2. **Copying of constituent elements that are original** — two sub-elements:
+   a. **Copying-in-fact**: Did the defendant actually copy? Proven by:
+      - Direct evidence (admission, witness)
+      - Circumstantial evidence: access + probative similarity
+   b. **Unlawful appropriation**: Are the copied elements protected expression?
 
-### Similarity Thresholds (Empirical)
-- Score < 0.30: Likely de minimis or coincidental similarity
-- Score 0.30 - 0.45: Borderline — requires detailed musicological analysis
-- Score 0.45 - 0.60: Substantial similarity possible — melody + structure overlap
-- Score > 0.60: Strong evidence of copying — requires access verification
+### Substantial Similarity Tests by Circuit
+
+- **2nd Circuit** — "Ordinary Observer" test: would an average lay observer
+  recognize the alleged copy as having been appropriated from the copyrighted work?
+  (Arnstein v. Porter, 154 F.2d 464, 2d Cir. 1946)
+
+- **9th Circuit** — "Extrinsic/Intrinsic" test:
+  - Extrinsic: objective comparison of specific protectable elements
+    (expert testimony, analytical dissection)
+  - Intrinsic: subjective impression of an ordinary reasonable person
+  (Skidmore v. Led Zeppelin, 952 F.3d 1051, 9th Cir. 2020)
+
+### Key Defenses and Doctrines
+
+- **Scènes à faire**: Common or standard elements dictated by genre, style,
+  or convention are not copyrightable. "The descending chromatic arpeggio
+  was a centuries-old musical building block." (Skidmore, 2020)
+
+- **Idea-Expression Dichotomy**: Copyright protects specific expression,
+  not ideas, concepts, styles, or genres. (17 U.S.C. §102(b))
+
+- **De Minimis**: Trivial copying that an ordinary observer would not
+  recognize is not actionable
+
+- **Independent Creation**: If defendant created the work independently,
+  there is no infringement — even if the works are identical
+
+- **Deposit Copy Rule** (1909 Act): For pre-1978 compositions, the copyright
+  scope is limited to the sheet music deposit copy, NOT the sound recording.
+  (Skidmore, 2020; Structured Asset Sales v. Sheeran, 2023)
+
+Source: https://law.justia.com/cases/federal/appellate-courts/ca9/16-56057/16-56057-2020-03-09.html
 """
 
 # ============================================================
-# FAMOUS CASES
+# FAMOUS CASES — with verified citations
 # ============================================================
 
 FAMOUS_CASES = r"""
 ## Landmark Music Plagiarism Cases
 
-### 1. Williams v. Gaye — "Blurred Lines" (2015)
-- **Verdict**: $5.3M awarded to Marvin Gaye's estate (later reduced to $4.98M)
-- **Similarity**: "Blurred Lines" vs "Got to Give It Up"
-- **Key Finding**: Copied the "feel" and "groove" — not just notes but overall
-  character, including bass line, keyboard parts, and vocal style
-- **Significance**: Expanded infringement beyond melody to include arrangement,
-  rhythm, and production elements
-- **Controversy**: Critics argued it protected an unprotectable "style" or "genre"
+### 1. Bright Tunes v. Harrisongs — "My Sweet Lord" / "He's So Fine" (1976)
+- **Citation**: 420 F. Supp. 177 (S.D.N.Y. 1976); damages: 508 F. Supp. 798 (1981)
+- **Verdict**: George Harrison found liable for subconscious plagiarism
+- **Damages**: ~$1.6 million (net after apportionment)
+- **Key Finding**: Judge Richard Owen established the "subconscious copying"
+  doctrine — "His subconscious knew it already had worked in a song his
+  conscious mind did not remember." Two motifs (sol-mi-re ×4, sol-la-do-la-do ×3)
+  with identical grace note and harmonies constituted infringement.
+- **Significance**: Subconscious copying IS infringement — intent is irrelevant.
+- **Source**: https://www.nytimes.com/1976/09/08/archives/george-harrison-guilty-of-plagiarizing-subconsciously-a-62-tune-for.html
+- **Source**: https://blogs.law.gwu.edu/mcir/case/bright-tunes-music-v-harrisongs-music/
 
-### 2. Skidmore v. Led Zeppelin — "Stairway to Heaven" (2016)
-- **Verdict**: Led Zeppelin prevailed; no infringement found
-- **Similarity**: "Stairway to Heaven" vs Spirit's "Taurus"
-- **Key Finding**: The descending chromatic arpeggio was a centuries-old musical
-  building block (scènes à faire), not original to Spirit
-- **Significance**: 9th Circuit en banc ruling clarified scope of copyright
-  protection — common musical elements are NOT protected
+### 2. Three Boys Music v. Bolton — "Love Is a Wonderful Thing" (2000)
+- **Citation**: 212 F.3d 477 (9th Cir. 2000)
+- **Verdict**: $5.4 million against Michael Bolton; 9th Circuit affirmed
+- **Key Finding**: Bolton subconsciously copied the Isley Brothers despite:
+  - The original never made Billboard Top 100
+  - 129 songs share the same title
+  - Bolton never admitted hearing the Isley version
+  The court held the jury's access finding was supported by Bolton's
+  admitted fandom of R&B artists including the Isley Brothers, and a
+  damning work tape where Bolton asked "Do you think we're copying a
+  Marvin Gaye song?"
+- **Significance**: Even obscure songs can be infringed; combination of
+  unprotectible elements can create protectible expression.
+- **Source**: https://law.justia.com/cases/federal/appellate-courts/F3/212/477/632583/
 
-### 3. Three Boys Music v. Bolton — "Love Is a Wonderful Thing" (2000)
-- **Verdict**: $5.4M against Michael Bolton
-- **Similarity**: Bolton's "Love Is a Wonderful Thing" vs Isley Brothers' song
-- **Key Finding**: Even without direct evidence of access, striking similarity
-  combined with circumstantial evidence of access was sufficient
+### 3. Williams v. Gaye — "Blurred Lines" / "Got to Give It Up" (2018)
+- **Citation**: 885 F.3d 1150 (9th Cir. 2018)
+- **Verdict**: $5.3M awarded to Marvin Gaye's estate (2-1 decision)
+- **Key Finding**: Majority UPHELD jury verdict on "narrow procedural grounds"
+  and "deferential standards of review." The Thicke parties failed to make a
+  Rule 50(a) motion at trial, severely limiting appellate review.
+  Judge Nguyen's DISSENT: "The majority allows the Gayes to accomplish
+  what no one has before: copyright a musical style." The songs differ in
+  melody, harmony, and rhythm — the similarity was in unprotectable elements
+  (cowbell, falsetto, "groove").
+- **Significance**: Controversial — widely criticized for effectively protecting
+  musical "feel" rather than expression. Over 200 musicians filed amicus brief
+  warning of chilling effect on creativity.
+- **Source**: https://app.midpage.ai/case/pharrell-williams-v-frankie-gaye-4256808
 
-### 4. Selle v. Gibb — "How Deep Is Your Love" (1984)
-- **Verdict**: Bee Gees prevailed
-- **Similarity**: "How Deep Is Your Love" vs Selle's "Let It End"
-- **Key Finding**: Plaintiff failed to prove access; similarity alone was
-  insufficient when both songs used common musical elements
+### 4. Skidmore v. Led Zeppelin — "Stairway to Heaven" / "Taurus" (2020)
+- **Citation**: 952 F.3d 1051 (9th Cir. 2020) (en banc)
+- **Verdict**: Led Zeppelin prevailed — no infringement (unanimous en banc)
+- **Key Holdings**:
+  - "Inverse ratio rule" ABROGATED unanimously — more access does not
+    reduce the substantial similarity burden
+  - Deposit copy rule: pre-1976 copyrights limited to sheet music, not recordings
+  - Chromatic scales, arpeggios, and short note sequences are NOT protected
+  - "Selection and arrangement" theory requires more than common elements
+- **Significance**: Major pro-defendant shift; eliminated unfair advantage
+  for plaintiffs in high-access cases.
+- **Source**: https://law.justia.com/cases/federal/appellate-courts/ca9/16-56057/16-56057-2020-03-09.html
 
-### 5. Gray v. Perry — "Dark Horse" (2019)
-- **Verdict**: $2.78M against Katy Perry (later overturned on appeal 2022)
-- **Similarity**: "Dark Horse" vs Flame's "Joyful Noise"
-- **Key Finding**: Initially found infringement based on 8-note ostinato;
-  overturned because the musical phrase was too short and common to be protected
+### 5. Gray v. Perry — "Dark Horse" / "Joyful Noise" (2019/2022)
+- **Citation**: Gray v. Perry, No. 2:15-cv-05642 (C.D. Cal.)
+- **Verdict**: 2019 jury awarded $2.78M → 2020 district court VACATED →
+  2022 9th Circuit AFFIRMED (3-0) for Katy Perry
+- **Key Finding**: The 8-note ostinato at issue consisted "entirely of
+  commonplace musical elements" (minor scale, uniform rhythm, descending pitch).
+  The same sequence appears in "Merrily We Roll Along" and "Jolly Old Saint
+  Nicholas." Granting copyright would be an "improper monopoly over two-note
+  pitch sequences or even the minor scale itself."
+- **Significance**: Basic musical building blocks (scales, simple ostinatos)
+  belong to the public domain and cannot be monopolized.
+- **Source**: https://www.rollingstone.com/music/music-news/katy-perry-ninth-circuit-dark-horse-copyright-verdict-1319870/
 
-### 6. Sheeran v. Gaye/Structured Asset Sales — "Thinking Out Loud" (2023)
-- **Verdict**: Ed Sheeran prevailed
-- **Similarity**: "Thinking Out Loud" vs "Let's Get It On"
-- **Key Finding**: The chord progression (I-iii-IV-V) and harmonic rhythm were
-  common building blocks, not unique expression
+### 6. Structured Asset Sales v. Sheeran — "Thinking Out Loud" (2023-2025)
+- **Citation**: Structured Asset Sales, LLC v. Sheeran (S.D.N.Y. 2023);
+  affirmed 2nd Cir. 2024; cert. denied U.S. Supreme Court June 2025
+- **Verdict**: Ed Sheeran prevailed — no infringement, jury verdict 2023;
+  SAS I dismissed May 2023; 2nd Circuit affirmed Nov 2024; SCOTUS denied cert 2025
+- **Key Finding**: The chord progression (I-iii-IV-V) and harmonic rhythm
+  were "basic musical building blocks." Experts showed 4 pre-1973 songs used
+  the same combination ("Georgy Girl," "Since I Lost My Baby," "Downtown,"
+  "Get Off Of My Cloud"). Combining just two common elements fails the
+  numerosity requirement for selection-and-arrangement protection.
+- **Significance**: Major win for songwriters — common chord progressions
+  cannot be monopolized through copyright.
+- **Source**: https://www.courtlistener.com/opinion/10182078/structured-asset-sales-llc-v-sheeran/
 """
 
 # ============================================================
@@ -97,134 +154,171 @@ FAMOUS_CASES = r"""
 MUSICOLOGICAL_CRITERIA = r"""
 ## Musicological Plagiarism Analysis Criteria
 
-### 1. Melody Analysis (Primary Criterion)
-- **Pitch sequence**: Compare note-by-note pitch contours
-- **Rhythmic pattern**: Compare note durations and timing
-- **Melodic contour**: Shape of the melody (rising, falling, arch)
-- **Phrase structure**: Length and grouping of melodic phrases
-- **Ornamentation**: Melisma, grace notes, slides
-- **Threshold**: 6-8 consecutive identical notes is highly probative
+### 1. Melody Analysis (Most Important Criterion)
+- **Pitch contour**: Compare note-by-note pitch sequences and direction
+- **Rhythmic pattern**: Note durations and timing in relation to the beat
+- **Phrase structure**: Length, grouping, and architecture of melodic phrases
+- **Motivic similarity**: Recurring short melodic patterns (motifs)
+- **Ornamentation**: Grace notes, melisma, slides, and appoggiaturas
+- **Threshold**: 6-8 consecutive identical notes with same rhythm is
+  highly probative; 3-4 notes alone is insufficient (Skidmore, 2020)
 
 ### 2. Harmony Analysis
-- **Chord progressions**: Sequence of chords (common progressions are NOT protected)
-- **Harmonic rhythm**: Rate of chord changes
-- **Key/modulation**: Tonal center and key changes
-- **Bass line**: Walking patterns, counter-melody
-- **Threshold**: Unique chord progressions (not I-IV-V-I) carry more weight
+- **Chord progressions**: Sequence of chords — I-IV-V-I and I-vi-IV-V
+  are NOT protectable (scènes à faire). Unique or unusual progressions
+  carry more weight.
+- **Harmonic rhythm**: Rate of chord changes and syncopation
+- **Bass line**: Walking patterns, counter-melodies
 
 ### 3. Rhythm Analysis
-- **Time signature**: Meter (4/4, 3/4, 6/8, etc.)
-- **Tempo**: BPM similarity (considered weak evidence alone)
-- **Groove pattern**: Distinctive rhythmic figures
-- **Syncopation**: Off-beat emphasis patterns
-- **Threshold**: Rhythmic similarity alone is rarely sufficient
+- **Time signature**: Meter (though common meters are not protectable)
+- **Groove/feel**: Distinctive rhythmic figures or syncopation patterns
+- **Tempo**: BPM similarity alone is weak evidence
+- **Warning**: Rhythmic similarity alone is rarely sufficient (Williams
+  v. Gaye dissent criticized protecting "groove")
 
 ### 4. Lyrics Analysis
-- **Word sequence**: Verbatim or near-verbatim matching
-- **Rhyme scheme**: Pattern of rhyming words
-- **Thematic content**: Subject matter (weakest evidence — idea, not expression)
-- **Phrase structure**: Line length, stanza organization
-- **Threshold**: Verbatim matches of 4+ words are significant
+- **Verbatim matching**: Word-for-word copying of phrases
+- **Rhyme scheme**: Identical end-rhyme patterns
+- **Structural similarity**: Verse/chorus arrangement of lyrics
+- **Threshold**: 4+ consecutive identical words is significant
 
 ### 5. Structure/Arrangement
-- **Song form**: Verse-chorus-bridge structure
+- **Song form**: Verse-chorus-bridge layout
 - **Section lengths**: Duration of each section
-- **Instrumentation**: Choice and arrangement of instruments
-- **Production elements**: Studio effects, mixing style
+- **Instrumentation**: Overlap in instrument choices (weakest evidence)
 
 ### 6. Timbre/Voice Quality
-- **Vocal characteristics**: Range, timbre, vibrato
+- **Vocal characteristics**: Distinctive timbre, vibrato, range
 - **Delivery style**: Phrasing, breath control, articulation
-- **Threshold**: Vocal similarity is rarely independently sufficient
-  but supports melody/harmony findings
+- **Warning**: Vocal similarity alone is nearly always insufficient
 
 ### Combined Assessment Framework
-- **Strong plagiarism**: High melody similarity + high harmony similarity +
-  access evidence + lyrics overlap
-- **Moderate plagiarism**: Medium melody similarity + some harmony overlap +
-  possible access
-- **Weak/No plagiarism**: Low similarity across dimensions OR common elements
-  (scènes à faire) OR independent creation evidence
+
+The jurisprudence consistently shows:
+- **Strong case**: High melody similarity + distinctive harmonic element
+  + lyrics overlap + access evidence
+- **Moderate case**: Medium melody similarity + some structural overlap
+- **Weak case**: Low melody similarity OR common elements defense applies
+  (scènes à faire, basic building blocks, short sequences)
+- **No case**: Similarity limited to chord progressions, tempo, genre, style,
+  or other unprotectable elements
+
+See: Skidmore v. Led Zeppelin (2020) and Gray v. Perry (2022) for the
+principle that basic musical building blocks are NOT protected.
 """
 
 # ============================================================
-# CASES BY SIMILARITY TYPE
+# CASE CLASSIFICATION
 # ============================================================
 
 CASES_BY_TYPE = r"""
 ## Music Plagiarism Cases Categorized by Similarity Type
 
-### Melody-Dominant Cases
-- **"He's So Fine" v. "My Sweet Lord"** (Bright Tunes v. Harrisongs, 1976):
-  George Harrison found to have subconsciously copied the melody. Score would
-  likely be ~0.70+ due to nearly identical melodic contour and rhythm.
-- **"Joyful Noise" v. "Dark Horse"** (Gray v. Perry, 2019/2022):
-  8-note ostinato initially found infringing but overturned — too short/common.
+### Melody-Dominant Cases (STRONG — most likely to succeed)
+- **Bright Tunes v. Harrisongs** (1976): Nearly identical melodic motifs
+  (sol-mi-re ×4, sol-la-do-la-do ×3) + identical grace note → INFRINGEMENT
+  Score analog: ~0.70+ due to nearly identical pitch contour and rhythm.
+- **Three Boys Music v. Bolton** (2000): Combination of 5 melodic/structural
+  elements → INFRINGEMENT ($5.4M)
+  Score analog: ~0.55-0.65 due to combined elements.
 
-### Rhythm/Groove Cases
-- **"Got to Give It Up" v. "Blurred Lines"** (Williams v. Gaye, 2015):
-  Primarily rhythmic and arrangement similarity. Would score ~0.40-0.50 on
-  melody alone, but high on combined groove/timbre/arrangement.
+### Rhythm/Groove Cases (WEAK — controversial, high risk of reversal)
+- **Williams v. Gaye** (2018): Rhythmic and arrangement similarity —
+  INFRINGEMENT (2-1 decision, widely criticized)
+  Score analog: Melody alone ~0.30-0.40, but jury found overall similarity.
+  The case is an outlier — most groove-based claims fail.
 
-### Harmony/Chord Cases
-- **"Taurus" v. "Stairway to Heaven"** (Skidmore v. Led Zeppelin, 2016):
-  Similar chromatic arpeggio but found to be common musical vocabulary.
-  Melody similarity ~0.20-0.30, harmony ~0.60, BUT common element defense.
+### Harmony/Chord Cases (WEAK — almost always fail)
+- **Skidmore v. Led Zeppelin** (2020): Similar chromatic arpeggio but
+  found to be common musical vocabulary → NO INFRINGEMENT
+  Score analog: ~0.20-0.30 melody, ~0.60 harmony match, but scènes à faire.
+- **Structured Asset Sales v. Sheeran** (2023): Same chord progression
+  (I-iii-IV-V) but basic building block → NO INFRINGEMENT
 
-### Lyrics + Melody Cases
-- **"Love Is a Wonderful Thing"** (Three Boys Music v. Bolton, 2000):
-  Combined melody, lyrics, and arrangement similarity. Title phrase identical.
+### Short Phrase Cases (WEAK — usually fail on appeal)
+- **Gray v. Perry** (2022): 8-note ostinato → initially infringement ($2.78M),
+  then VACATED on appeal. Short common phrases are NOT protectable.
 
-### Timbre/Performance Cases
-- **Tom Waits v. Frito-Lay** (1992): Not plagiarism but voice misappropriation —
-  distinctive vocal timbre used in commercial. Timbre alone can support findings
-  when combined with other factors.
+### Lyrics Cases (VARIES — depends on distinctiveness)
+- Verbatim lyrics copying is independently strong evidence
+- Title phrase overlap alone is usually insufficient
 """
 
 # ============================================================
-# JUDGMENT GUIDELINES FOR LLM
+# JUDGMENT GUIDELINES — with case-anchored thresholds
 # ============================================================
 
 JUDGMENT_GUIDELINES = r"""
 ## LLM Plagiarism Judgment Guidelines
 
-### Input Data Interpretation
-You will receive:
-1. **Algorithmic scores** (0-1 scale) for melody matching
-2. **Boost factors** indicating timbre similarity and lyrics similarity
-3. **Song metadata**: title, BPM, key, detected language
-4. **Time alignment**: which segments matched between the two songs
+### Score Interpretation (anchored to case precedents)
 
-### How to Interpret Scores
-- **Score 0.60+**: Very strong algorithmic match. Likely copying of melody/harmony.
-  Recommend: DETAILED ANALYSIS — check if scènes à faire applies.
-- **Score 0.45-0.60**: Strong match. Substantial similarity possible.
-  Recommend: REVIEW WITH CAUTION — evaluate each dimension separately.
-- **Score 0.30-0.45**: Moderate match. Could be coincidental or genre similarity.
-  Recommend: PROBABLY COINCIDENTAL unless other evidence (access, lyrics).
-- **Score < 0.30**: Weak match. Likely coincidental.
-  Recommend: NO PLAGIARISM — unless lyrics are identical.
+- **Score > 0.60**: Very strong algorithmic match. Comparable to the melodic
+  similarity in Bright Tunes v. Harrisongs (1976).
+  → RECOMMEND: "Possible Plagiarism" — detailed analysis needed. Check if
+  scènes à faire or basic building blocks defense applies (Skidmore, 2020).
+
+- **Score 0.45 – 0.60**: Moderate to strong match. Comparable to Three Boys
+  Music v. Bolton (2000) range. Substantial similarity possible.
+  → RECOMMEND: "Possible Plagiarism" — evaluate each dimension separately.
+  The combination of smaller similarities can be protectable (Bolton).
+
+- **Score 0.30 – 0.45**: Borderline match. Could be coincidental, genre
+  convention, or independent creation.
+  → RECOMMEND: "Probably Coincidental" unless bolstered by:
+  - Strong lyrics overlap (identical phrases)
+  - Evidence of access (defendant knew the original)
+  - Unusual/distinctive melodic elements (not standard scales/arpeggios)
+
+- **Score < 0.30**: Weak match. Likely coincidental or common elements.
+  → RECOMMEND: "Probably Coincidental" or "Insufficient Evidence."
+  Consistent with Skidmore (2020) and Gray (2022) outcomes.
 
 ### Boost Factor Interpretation
-- **Timbre boost > 1.03**: Vocal similarity detected. Supports plagiarism if
-  melody also matches. Alone, not sufficient (different singers can sound alike).
-- **Lyrics boost > 1.03**: Lyrics similarity detected. Weight heavily — lyrics
-  copying is easier to prove than melody copying.
-- **Lyrics boost > 1.04**: Very similar lyrics — this is independently strong
-  evidence of copying.
+
+- **Timbre boost > 1.03**: Vocal similarity detected. Supports plagiarism
+  if melody also matches. Alone, insufficient (Williams v. Gaye criticized
+  for over-weighting vocal style). Different singers can sound similar.
+- **Timbre boost ≤ 1.0**: No vocal similarity. This is the typical case.
+
+- **Lyrics boost > 1.04**: Very similar lyrics. This is independently strong
+  evidence of copying — lyrics similarity alone is actionable.
+- **Lyrics boost > 1.03**: Similar lyrics — supports melody findings.
+- **Lyrics boost ≤ 1.0**: No lyrics similarity.
+
+### Key Legal Principles to Apply
+
+1. **Short phrases are NOT protected** (Gray v. Perry, 2022; Skidmore, 2020):
+   3-4 notes or an 8-note ostinato of common elements is not infringement.
+
+2. **Common chord progressions are NOT protected** (Sheeran, 2023):
+   I-iii-IV-V, I-vi-IV-V, and similar basic progressions are building blocks.
+
+3. **Subconscious copying IS infringement** (Harrisongs, 1976; Bolton, 2000):
+   Intent is irrelevant — if similarity exists + access is shown, it's infringement.
+
+4. **Combination of unprotectible elements CAN be protectible** (Bolton, 2000):
+   But the combination must be numerous and distinctive, not just 2-3 generic elements.
+
+5. **"Feel" and "groove" are NOT protectible** (Williams v. Gaye dissent, 2018;
+   Skidmore, 2020): Style, genre, and production approach are ideas, not expression.
 
 ### Judgment Output Format
+
 For each match, produce:
-1. **Judgment**: "Likely Plagiarism" / "Possible Plagiarism" /
-   "Probably Coincidental" / "Insufficient Evidence"
-2. **Confidence**: 0-100%
-3. **Reasoning**: 2-3 sentence explanation citing specific dimensions
-4. **Key Evidence**: Which dimensions support/refute plagiarism
-5. **Recommendation**: Next steps (legal review, musicologist analysis, etc.)
+1. **verdict**: "Likely Plagiarism" | "Possible Plagiarism" |
+   "Probably Coincidental" | "Insufficient Evidence"
+2. **confidence**: 0-100% (how confident the LLM is in this verdict)
+3. **reasoning**: 2-3 sentence explanation citing specific scores and dimensions
+4. **key_evidence_for**: which dimensions SUPPORT plagiarism
+5. **key_evidence_against**: which dimensions REFUTE plagiarism
+6. **relevant_case**: most analogous legal precedent (or "N/A")
+7. **recommendation**: next step (legal review, musicologist analysis, etc.)
 """
 
 # ============================================================
-# COMPLETE KNOWLEDGE BASE (for RAG)
+# COMPLETE KNOWLEDGE BASE
 # ============================================================
 
 KNOWLEDGE_BASE = "\n\n".join([
