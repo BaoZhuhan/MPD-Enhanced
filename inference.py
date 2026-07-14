@@ -10,6 +10,9 @@ Usage:
   python inference.py /path/to/song.wav
 """
 
+# ── SAFETY: must import before ANY CUDA-using module ──
+import safety  # noqa: F401 — patches pin_memory, sets CUDA allocator
+
 import os
 import sys
 import json
@@ -21,7 +24,7 @@ from judging.llm_judge import llm_judge
 from schemas import MatchResult, PlagiarismReport
 
 
-def inference(audio_path, library_path=None, output_dir=None):
+def inference(audio_path, library_path=None, output_dir=None, api_key=None):
     """
     Run the full 3-phase plagiarism detection pipeline.
 
@@ -29,6 +32,7 @@ def inference(audio_path, library_path=None, output_dir=None):
         audio_path: path to input audio file
         library_path: path to covers80 library dir (default: auto-detect)
         output_dir: directory for output JSON (default: same as input)
+        api_key: DeepSeek API key for Phase 3 LLM judgment (optional)
 
     Returns:
         dict with keys:
@@ -44,8 +48,10 @@ def inference(audio_path, library_path=None, output_dir=None):
         raw_results = get_one_result(json_path, library_path=library_path)
         matches = result_formatting(raw_results)
 
-        # ── Phase 3: LLM judgment (future) ──
-        report = llm_judge(matches)
+        # ── Phase 3: LLM judgment ──
+        # Load features from generated JSON for context
+        features = _load_features(json_path)
+        report = llm_judge(matches, features=features, api_key=api_key)
 
         return {
             "success": True,
@@ -108,7 +114,7 @@ def result_formatting(result):
 
 
 def _serialize(report):
-    """Convert PlagiarismReport to JSON-safe dict."""
+    """Convert PlagiarismReport to JSON-safe dict for frontend."""
     if isinstance(report, dict) and "matches" in report:
         return {
             "matches": [
@@ -117,19 +123,37 @@ def _serialize(report):
             ],
             "judgment": report.get("judgment"),
             "analysis": report.get("analysis"),
+            "risk_level": report.get("risk_level"),
             "message": report.get("message", "success"),
         }
     return report
 
 
+def _load_features(json_path):
+    """Load song features from Phase 1 output JSON for LLM context."""
+    try:
+        with open(json_path, "r") as f:
+            data = json.load(f)
+        return {
+            "bpm": data.get("bpm"),
+            "rhythm": data.get("rhythm"),
+            "title": data.get("title"),
+            "language": data.get("lyrics", {}).get("language")
+            if data.get("lyrics") else None,
+        }
+    except Exception:
+        return None
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(json.dumps({"success": False, "error": "Usage: python inference.py <audio_path>"}))
+        print(json.dumps({"success": False, "error": "Usage: python inference.py <audio_path> [library_path] [output_dir] [api_key]"}))
         sys.exit(1)
 
     audio_path = sys.argv[1]
     library_path = sys.argv[2] if len(sys.argv) > 2 else None
     output_dir = sys.argv[3] if len(sys.argv) > 3 else None
+    api_key = sys.argv[4] if len(sys.argv) > 4 else os.environ.get("DEEPSEEK_API_KEY")
 
-    result = inference(audio_path, library_path=library_path, output_dir=output_dir)
+    result = inference(audio_path, library_path=library_path, output_dir=output_dir, api_key=api_key)
     print(json.dumps(result, indent=2, ensure_ascii=False))

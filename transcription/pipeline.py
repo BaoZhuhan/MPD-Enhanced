@@ -1,3 +1,7 @@
+# ── SAFETY: must come before any CUDA init ──
+import safety  # noqa: F401 — patches pin_memory, sets CUDA allocator
+safety.limit_gpu_memory(0.75)  # reserve 25% for driver safety
+
 import os
 import numpy as np
 import librosa
@@ -79,11 +83,12 @@ def segment_transcription(audio_path, output_dir=None):
         # 두 번째 분리: vocals, drums, bass, other
         print("Step 2: Separating vocals, drums, bass, other...")
         demucs.separate.main([
-            "-n", "htdemucs", 
-            "-o", separated_base, 
+            "-n", "htdemucs",
+            "-o", separated_base,
             to_name
         ])
-        
+        safety.sync_cuda()  # flush Demucs async ops
+
         # 분리된 파일 경로들
         vocal_wav_name = f"{separated_base}/htdemucs/{wav_name}/vocals.wav"
         drum_wav_name = f"{separated_base}/htdemucs/{wav_name}/drums.wav"
@@ -122,16 +127,20 @@ def segment_transcription(audio_path, output_dir=None):
         soundfile.write(other_wav_name, real_others.T, 44100)
 
         print("Step 5: Quantizing audio...")
-        quantize_result = wav_quantizing(wav_path, spleeter_dict, downbeat_model, beat_tracker, downbeat_tracker, device) 
-        
+        quantize_result = wav_quantizing(wav_path, spleeter_dict, downbeat_model, beat_tracker, downbeat_tracker, device)
+        safety.sync_cuda()
+
         print("Step 6: Transcribing vocals...")
         vocal_notes = vocal_midi2note(vocal_trans(vocal_wav_path, device=device))
+        safety.sync_cuda()
 
         print("Step 6.5: Extracting vocal timbre embedding...")
         vocal_embed = extract_vocal_embedding(vocal_wav_path, device=device)
+        safety.sync_cuda()
 
         print("Step 6.6: Transcribing lyrics with Whisper...")
         lyrics_result = transcribe_lyrics(vocal_wav_path, model_size="base", device=device)
+        safety.sync_cuda()
 
         # chord_info = transcript("chord", wav_path)[1]  # 주석 처리됨
 

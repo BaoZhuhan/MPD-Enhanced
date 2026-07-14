@@ -10,6 +10,11 @@ cd "$SCRIPT_DIR"
 # 激活 conda 环境
 source /opt/anaconda3/bin/activate mpd
 
+# ── NVIDIA Driver 560.35.03 Bug Mitigation ──
+# 避免 triggered pinned-memory kernel NULL pointer dereference
+export PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True,backend:native"
+export CUDA_MODULE_LOADING="LAZY"
+
 # 配置 hf-mirror（可选，加快 HuggingFace 模型下载）
 export HF_ENDPOINT=https://hf-mirror.com
 export HF_HUB_DISABLE_XET=1
