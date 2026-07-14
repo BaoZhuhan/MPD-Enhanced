@@ -211,6 +211,21 @@ The pipeline auto-discovers new boosts via `compute_all_boosts()`.
 
 GPL License.
 
+## References
+
+The LLM Judger's knowledge base is sourced from verified court opinions and legal databases:
+
+| Case | Citation | Source |
+|------|----------|--------|
+| Bright Tunes v. Harrisongs (1976) | 420 F. Supp. 177 (S.D.N.Y.) | [GWU MCIR](https://blogs.law.gwu.edu/mcir/case/bright-tunes-music-v-harrisongs-music/) |
+| Three Boys Music v. Bolton (2000) | 212 F.3d 477 (9th Cir.) | [Justia](https://law.justia.com/cases/federal/appellate-courts/F3/212/477/632583/) |
+| Williams v. Gaye (2018) | 885 F.3d 1150 (9th Cir.) | [Midpage AI](https://app.midpage.ai/case/pharrell-williams-v-frankie-gaye-4256808) |
+| Skidmore v. Led Zeppelin (2020) | 952 F.3d 1051 (9th Cir. en banc) | [Justia](https://law.justia.com/cases/federal/appellate-courts/ca9/16-56057/16-56057-2020-03-09.html) |
+| Gray v. Perry (2019/2022) | No. 2:15-cv-05642 (C.D. Cal.) | [Rolling Stone](https://www.rollingstone.com/music/music-news/katy-perry-ninth-circuit-dark-horse-copyright-verdict-1319870/) |
+| Structured Asset Sales v. Sheeran (2023) | S.D.N.Y. 2023; aff'd 2d Cir. 2024 | [CourtListener](https://www.courtlistener.com/opinion/10182078/structured-asset-sales-llc-v-sheeran/) |
+
+Legal doctrines sourced from: *Arnstein v. Porter*, 154 F.2d 464 (2d Cir. 1946); 17 U.S.C. §102(b).
+
 ## Citation
 
 ```bibtex
